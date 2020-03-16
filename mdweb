@@ -1,0 +1,116 @@
+#!/bin/bash
+
+source config
+
+# Creates a new page from a template
+newpage() {
+	read -erp "Enter the path for the new page [top level]: " path
+	path=${path:-""}
+	read -erp "Enter a title for the new page: " title
+	while [ -z "$title" ]; do
+		read -erp "You have to enter a title: " title
+	done
+	filename="${title// /-}.md"
+	echo "Choose one of the following templates for the new page:"
+	ls templates/markdown
+	read -erp "Enter the name of the template [default.md]: " template
+	template=${template:-default.md}
+	if [ "$path" != "" ]; then
+		read -erp "Would you like a custom header and footer for all pages in path $local_dir/$path? (y/n) [n]" custheadfoot
+	fi
+	read -erp "Add this page to the navigation? (y/n) [n]: " addnav
+	if [ "$addnav" = "y" ]; then
+		echo "[$title]($path/$filename)" >> .data/navigation.md
+	fi
+
+	mkdir -p "markdown/$path"
+	cp "templates/markdown/$template" "markdown/$path/$filename"
+	format "markdown/$path/$filename"
+
+	echo
+	echo "Page created successfully!"
+	echo "You can now edit it by hand and add content."
+	if [ "$custheadfoot" = "y" ]; then
+		mkdir -p "templates/html/$path"
+		cp templates/html/header.html "templates/html/$path/header.html"
+		cp templates/html/footer.html "templates/html/$path/footer.html"
+		echo "You can edit the custom header and footer in templates/html/$path. They will be used on all pages in $local_dir/$path automatically."
+	fi
+	echo "When you're done, run './mdweb u' to create all html pages in the html directory or './mdweb d' to directly deploy to the server."
+}
+
+# Replaces %MACROS% in the given MD file
+format() {
+	day=$(date +"%a")
+	date=$(date +"%d.%m.%Y")
+	time=$(date +"%k:%M")
+	year=$(date +"%Y")
+	pagename=$(basename $1 | sed "s/-/ /g; s/.html//g")
+
+	sed -i "s|%PAGENAME%|$pagename|g" $1
+	sed -i "s|%TITLE%|$title|g" $1
+	sed -i "s|%AUTHOR%|$author|g" $1
+	sed -i "s|%EMAIL%|$email|g" $1
+	sed -i "s|%DAY%|$day|g" $1
+	sed -i "s|%DATE%|$date|g" $1
+	sed -i "s|%TIME%|$time|g" $1
+	sed -i "s|%YEAR%|$year|g" $1
+	sed -i "s|%CSS%|$css|g" $1
+	sed -i "s|%INDEX%|$domain|g" $1
+}
+
+# Converts a MD file to HTML
+convert() {
+	output="${1%.md}.html"
+
+	markdown $1 > "$1.build"
+
+	path_full=$(dirname $1)
+	path=${path_full#"$local_dir/"}
+	headerfile="templates/html/header.html"
+	footerfile="templates/html/footer.html"
+
+	if [ -f "templates/html/$path/header.html" ]; then
+		headerfile="templates/html/$path/header.html"
+	fi
+	if [ -f "templates/html/$path/footer.html" ]; then
+		footerfile="templates/html/$path/footer.html"
+	fi
+	
+	cat  $headerfile $1.build $footerfile > $output
+
+	format $output
+	rm $1
+	rm $1.build
+	echo "Created $output."
+}
+
+# Creates HTML files from all the MD files
+update() {
+	rm -r "$local_dir/"
+	mkdir -p "$local_dir"
+	mkdir -p "$local_dir/css"
+	cp -r markdown/* "$local_dir"
+
+	for file in $(find "$local_dir" -name "*.md"); do
+		convert $file
+	done
+
+	cp -r css $local_dir
+	cp favicon.ico $local_dir
+	echo ""
+}
+
+# Deploys the local files to the server
+deploy() {
+	update
+	rsync -avz --delete --exclude repos $local_dir/ $server_dir
+	echo "Successfully updated server files."
+}
+
+case "$1" in
+	n*) newpage ;;
+	u*) update ;;
+	d*) deploy ;;
+	*) printf "Markdown Web system by Niklas Bühler <me@niklasbuehler.com>.\\nUsage:\\n  mdweb n:\\t new page\\n  mdweb u:\\t update html\\n  mdweb d:\\t deploy to server\\n" ;;
+esac

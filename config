@@ -1,0 +1,10 @@
+#!/bin/bash
+
+title="niklas@web: ~"
+domain="http://www.niklasbuehler.com"
+author="Niklas Bühler"
+email="hi@niklasbuehler.com"
+
+local_dir="/srv/http/website"
+css="/css"
+server_dir="root@niklasbuehler.com:/srv/http"
