@@ -104,7 +104,7 @@ update() {
 # Deploys the local files to the server
 deploy() {
 	update
-	rsync -avz --delete --exclude repos $local_dir/ $server_dir
+	rsync -avz --delete --exclude res $local_dir/ $server_dir
 	echo "Successfully updated server files."
 }
 

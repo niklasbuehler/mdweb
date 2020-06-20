@@ -1,3 +1,9 @@
+/*
+ * mnml.css
+ * A truly minimalist CSS template.
+ * www.github.com/niklasbuehler/mnml.css
+ */
+
 body {
 	color: #222;
 	background: #fafafa;
@@ -72,15 +78,4 @@ a:hover {
 
 .right {
 	float: right;
-}
-
-.entry {
-	/*border-left: 10px solid navy;*/
-	padding: 0px 10px 0px 10px;
-	margin-top: 64px;
-	margin-bottom: 20px;
-}
-
-.entry h2 {
-	margin: 5px auto 2px auto;
 }
