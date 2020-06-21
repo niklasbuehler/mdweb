@@ -18,10 +18,6 @@ newpage() {
 	if [ "$path" != "" ]; then
 		read -erp "Would you like a custom header and footer for all pages in path $local_dir/$path? (y/n) [n]" custheadfoot
 	fi
-	read -erp "Add this page to the navigation? (y/n) [n]: " addnav
-	if [ "$addnav" = "y" ]; then
-		echo "[$title]($path/$filename)" >> .data/navigation.md
-	fi
 
 	mkdir -p "markdown/$path"
 	cp "templates/markdown/$template" "markdown/$path/$filename"
