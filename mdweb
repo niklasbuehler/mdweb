@@ -77,9 +77,20 @@ convert() {
 		footerfile="templates/html/$path/footer.html"
 	fi
 	
-	cat  $headerfile $1.build $footerfile > $output
+	# Check if the file is part of a blog
+	case $1 in $blogpath)
+		# Cutting the date (formatted as _dd.mm.yyyy_) out of the blog posts third line and getting it into the date format that RSS accepts, damn hacky I know
+		#date=$(head -n 3 $1 | tail -n 1 | head -c -2 | tail -c +2 | awk -F. '{prinf "%s/%s/%s\n",$3,$2,$1}')
+		#rssdate=$(echo $date | date '+%a. %d %b %Y 12:00:00 %z')
+		#echo $rssdate
+		printf "\\n<item>\\n<title>%s</title>\\n<guid>%s%s</guid>\\n<pubDate>%s</pubDate>\\n<description><![CDATA[\\n%s\\n]]></description>\\n</item>\\n\\n" "$(head -n 1 $1)" "$domain" "$output" "$rssdate" "$(cat $1.build)" >> "$local_dir/rss.xml"
+		echo "Added RSS entry for $output."
+	esac
 
+	cat  $headerfile $1.build $footerfile > $output
+	
 	format $output
+
 	rm $1
 	rm $1.build
 	echo "Created $output."
@@ -92,9 +103,11 @@ update() {
 	mkdir -p "$local_dir/css"
 	cp -r markdown/* "$local_dir"
 
+	cat templates/rss/top.xml > "$local_dir/rss.xml"
 	for file in $(find "$local_dir" -name "*.md"); do
 		convert $file
 	done
+	cat templates/rss/bottom.xml >> "$local_dir/rss.xml"
 
 	cp -r css $local_dir
 	cp favicon.ico $local_dir

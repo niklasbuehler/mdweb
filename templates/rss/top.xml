@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<rss version="2.0">
+
+  <channel>
+    <title>/dev/tty1</title>
+    <link>http://www.niklasbuehler.com/blog</link>
+    <description>Some texts about Linux, the terminal and good software. And other stuff too.</description>
+    <language>en-us</language>
+    <copyright>Niklas Bühler</copyright>
+    <pubDate>Sat, 20 Jun 2020 0:00:00</pubDate>
+    <image>
+      <url>http://www.niklasbuehler.com/favicon.ico</url>
+      <title>/dev/tty1</title>
+      <link>http://www.niklasbuehler.com/blog</link>
+    </image>
+    
