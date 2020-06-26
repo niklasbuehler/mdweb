@@ -35,6 +35,17 @@ newpage() {
 	echo "When you're done, run './mdweb u' to create all html pages in the html directory or './mdweb d' to directly deploy to the server."
 }
 
+log() {
+	read -erp "Title: " title
+	read -erp "Text: " text
+	time=$(date +"%Y %h %d, %H:%M")
+	seconds=$(date +"%s")
+	link="<a id='$seconds' href='#$seconds'>#$seconds</a>"
+	logtxt="- $link $time &ndash; **$title**\\n\\n\\t$text\\n"
+	sed -ie "/^===/a $logtxt" "markdown/log/index.md"
+	echo "Successfully added '$title' to the log."
+}
+
 # Replaces %MACROS% in the given MD file
 format() {
 	day=$(date +"%a")
@@ -119,7 +130,8 @@ deploy() {
 
 case "$1" in
 	n*) newpage ;;
+	l*) log ;;
 	u*) update ;;
 	d*) deploy ;;
-	*) printf "Markdown Web system by Niklas Bühler <me@niklasbuehler.com>.\\nUsage:\\n  mdweb n:\\t new page\\n  mdweb u:\\t update html\\n  mdweb d:\\t deploy to server\\n" ;;
+	*) printf "Markdown Web system by Niklas Bühler <hi@niklasbuehler.com>.\\nUsage:\\n  mdweb n:\\t new page\\n  mdweb l:\\t new log entry\\n  mdweb u:\\t update html\\n  mdweb d:\\t deploy to server\\n" ;;
 esac

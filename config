@@ -1,6 +1,6 @@
 #!/bin/bash
 
-title="niklas@web: ~"
+title="niklas@web"
 domain="http://www.niklasbuehler.com"
 author="Niklas Bühler"
 email="hi@niklasbuehler.com"
