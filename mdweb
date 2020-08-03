@@ -92,7 +92,7 @@ convert() {
 		d=$(echo $datestr | cut -f1 -d.)
 		m=$(echo $datestr | cut -f2 -d.)
 		y=$(echo $datestr | cut -f3 -d.)
-		rssdate=$(date --date="$y/$m/$d" +"%a. %d %b %Y 12:00:00 %z")
+		rssdate=$(date --date="$y/$m/$d" +"%a, %d %b %Y 12:00:00 %z")
 		printf "\\n<item>\\n<title>%s</title>\\n<guid>%s%s</guid>\\n<pubDate>%s</pubDate>\\n<description><![CDATA[\\n%s\\n]]></description>\\n</item>\\n\\n" "$(head -n 1 $1)" "$domain" "$url_path" "$rssdate" "$(cat $1.build)" >> "$local_dir/rss.xml"
 		echo "Added RSS entry for $url_path."
 	esac
