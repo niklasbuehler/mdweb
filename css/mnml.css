@@ -50,6 +50,8 @@ blockquote {
 
 img {
 	max-width: 100%;
+	display: block;
+	margin: 0 auto;
 }
 
 table {
@@ -84,4 +86,8 @@ hr {
 	border: 0;
 	border-top: 1px solid #8c8c8c;
 	border-bottom: 1px solid #fff;
+}
+
+h1, h2, h3, h4, h5 {
+	text-align: center;
 }
