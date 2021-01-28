@@ -64,19 +64,22 @@ format() {
 	sed -i "s|%YEAR%|$year|g" $1
 	sed -i "s|%CSS%|$css|g" $1
 	sed -i "s|%INDEX%|$domain|g" $1
+	sed -i "1,2d" $1
 }
 
 # Converts a MD file to HTML
 convert() {
 	output="${1%.md}.html"
 
-	markdown $1 > "$1.build"
+	cat $1 | sed -e '1,2d' > "$1.prebuild"
+	pandoc -f markdown --mathjax -t html -o "$1.build" "$1.prebuild"
 
 	path_full=$(dirname $1)
 	path=${path_full#"$local_dir/"}
 	headerfile="templates/html/header.html"
 	footerfile="templates/html/footer.html"
 	url_path=${output#"$local_dir"}
+	title=$(head -n 1 $1)
 
 	if [ -f "templates/html/$path/header.html" ]; then
 		headerfile="templates/html/$path/header.html"
@@ -102,6 +105,7 @@ convert() {
 	format $output
 
 	rm $1
+	rm $1.prebuild
 	rm $1.build
 	echo "Created $output."
 }
@@ -111,6 +115,7 @@ update() {
 	rm -r "$local_dir/"
 	mkdir -p "$local_dir"
 	mkdir -p "$local_dir/css"
+	mkdir -p "$local_dir/res"
 	cp -r markdown/* "$local_dir"
 
 	cat templates/rss/top.xml > "$local_dir/rss.xml"
@@ -120,6 +125,7 @@ update() {
 	cat templates/rss/bottom.xml >> "$local_dir/rss.xml"
 
 	cp -r css $local_dir
+	cp -r res $local_dir
 	cp favicon.ico $local_dir
 	echo ""
 }
@@ -127,7 +133,7 @@ update() {
 # Deploys the local files to the server
 deploy() {
 	update
-	rsync -avz --delete --exclude res $local_dir/ $server_dir
+	rsync -avz --delete $local_dir/ $server_dir
 	echo "Successfully updated server files."
 }
 
